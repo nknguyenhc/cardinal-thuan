@@ -50,5 +50,5 @@ def create_documents(folder: str = "markdown") -> list[Document]:
 
 if __name__ == "__main__":
     documents = create_documents()
-    collection = create_collection(documents, name="testimony_of_hope")
+    collection = create_collection(documents, name="cardinal_thuan")
     print(f"Collection '{collection.name}' created with {len(documents)} documents.")
