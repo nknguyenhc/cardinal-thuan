@@ -67,3 +67,26 @@ def get_5_loave_and_2_fish_docs() -> list[Document]:
             if paragraph.strip():
                 documents.append(Document(text=paragraph.strip(), name=f"5 Chiếc Bánh và 2 Con Cá, {theme}, đoạn {i + 1}"))
     return documents
+
+def get_testimony_of_hope_docs() -> list[Document]:
+    with open("markdown/testimony-of-hope.md", "r", encoding="utf-8") as file:
+        text = file.read()
+    
+    regex = r'\[.?\]\{#bookmark\d*?\}(.*?\n?.*?)\[.?\]\{#bookmark\d*?\}'
+    parts: list[str] = re.split(regex, text)
+    assert len(parts) % 2 == 1, f"Unexpected number of parts in testimony-of-hope: got {len(parts)} parts"
+
+    documents: list[Document] = []
+    opening = parts[0]
+    for i, paragraph in enumerate(opening.split("\n\n")):
+        if paragraph.strip():
+            documents.append(Document(text=paragraph.strip(), name=f"Chứng Nhân Hy Vọng, lời mở đầu, đoạn {i + 1}"))
+    
+    for i in range(2, len(parts), 2):
+        theme = parts[i - 1].strip()
+        assert len(theme) < 100, f"Theme too long in testimony-of-hope: {theme[:100]}"
+        print(theme)
+        for i, paragraph in enumerate(parts[i].split("\n\n")):
+            if paragraph.strip():
+                documents.append(Document(text=paragraph.strip(), name=f"Chứng Nhân Hy Vọng, chủ đề {theme}, đoạn {i + 1}"))
+    return documents
