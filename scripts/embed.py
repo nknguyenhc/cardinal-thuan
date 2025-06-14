@@ -23,15 +23,21 @@ def get_road_of_hope_docs() -> list[Document]:
 
         theme = matches[0].strip("*")
         print(theme)
+        opening_content = ""
+        is_opening = True
 
-        for i, (part, title) in enumerate(zip(parts[2:], matches[1:])):
+        for part, title in zip(parts[2:], matches[1:]):
             # check if title is in the format "**(something)**"
-            if re.match(r'\*\*\(.*?\)\*\*', title):
+            if not re.match(r'\*\*\(.*?\)\*\*', title):
+                assert is_opening, f"Unexpected title format in {id}: {title}"
+                opening_content += " " + title.strip("*")
+            else:
+                if is_opening:
+                    is_opening = False
+                    if opening_content.strip():
+                        documents.append(Document(text=opening_content.strip(), name=f"Đường Hy Vọng, chủ đề {theme}, mở đầu"))
                 num = title[3:-3].strip()
                 documents.append(Document(text=part.strip(), name=f"Đường Hy Vọng, số {num}, chủ đề {theme}"))
-            else:
-                content = title.strip("*")
-                documents.append(Document(text=content, name=f"Đường Hy Vọng, chủ đề {theme}, dòng {i + 1}"))
         
     with open("markdown/road-of-hope-b.md", "r", encoding="utf-8") as file:
         text = file.read()
