@@ -37,9 +37,9 @@ class Db:
         chroma_client = chromadb.PersistentClient(path=path)
         self.collection = chroma_client.get_or_create_collection(name=name, embedding_function=GeminiEmbeddingFunction())
     
-    def query(self, query: str, n_results: int = 5):
+    def query(self, query: str, n_results: int = 20) -> list[Document]:
         results = self.collection.query(query_texts=[query], n_results=n_results)
-        return list(zip(results['ids'][0], results['documents'][0]))
+        return [Document(name=name, text=text) for name, text in zip(results['ids'][0], results['documents'][0])]
     
     def add_documents(self, documents: list[Document]):
         self.collection.add(documents=[doc.text for doc in documents], ids=[doc.name for doc in documents])

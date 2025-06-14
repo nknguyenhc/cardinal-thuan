@@ -24,14 +24,14 @@ def get_road_of_hope_docs() -> list[Document]:
         theme = matches[0].strip("*")
         print(theme)
 
-        for part, title in zip(parts[2:], matches[1:]):
+        for i, (part, title) in enumerate(zip(parts[2:], matches[1:])):
             # check if title is in the format "**(something)**"
             if re.match(r'\*\*\(.*?\)\*\*', title):
                 num = title[3:-3].strip()
                 documents.append(Document(text=part.strip(), name=f"Đường Hy Vọng, số {num}, chủ đề {theme}"))
             else:
                 content = title.strip("*")
-                documents.append(Document(text=content, name=f"Đường Hy Vọng, chủ đề {theme}"))
+                documents.append(Document(text=content, name=f"Đường Hy Vọng, chủ đề {theme}, dòng {i + 1}"))
         
     with open("markdown/road-of-hope-b.md", "r", encoding="utf-8") as file:
         text = file.read()
@@ -86,7 +86,18 @@ def get_testimony_of_hope_docs() -> list[Document]:
         theme = parts[i - 1].strip()
         assert len(theme) < 100, f"Theme too long in testimony-of-hope: {theme[:100]}"
         print(theme)
-        for i, paragraph in enumerate(parts[i].split("\n\n")):
+        for j, paragraph in enumerate(parts[i].split("\n\n")):
             if paragraph.strip():
-                documents.append(Document(text=paragraph.strip(), name=f"Chứng Nhân Hy Vọng, chủ đề {theme}, đoạn {i + 1}"))
+                documents.append(Document(text=paragraph.strip(), name=f"Chứng Nhân Hy Vọng, chủ đề {theme}, đoạn {j + 1}"))
     return documents
+
+def main():
+    database = Db()
+    database.add_documents(get_road_of_hope_docs())
+    database.add_documents(get_5_loave_and_2_fish_docs())
+    # database.add_documents(get_testimony_of_hope_docs())
+    print("Documents added to the database successfully.")
+
+
+if __name__ == "__main__":
+    main()
