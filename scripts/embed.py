@@ -32,5 +32,18 @@ def get_road_of_hope_docs() -> list[Document]:
             else:
                 content = title.strip("*")
                 documents.append(Document(text=content, name=f"Đường Hy Vọng, chủ đề {theme}"))
+        
+    with open("markdown/road-of-hope-b.md", "r", encoding="utf-8") as file:
+        text = file.read()
+    
+    parts = re.split(r'\n-{60,}\n', text)
+    assert len(parts) == 2, f"Unexpected number of parts in road-of-hope-b: got {len(parts)}"
+    main_text = parts[1].strip("-").strip()
+    match = re.search(r'\*\*(.*?)\*\*', main_text)
+    assert match, "No theme found in road-of-hope-b"
+    theme = match.group(1).strip("*()")
+    print(theme)
+    main_text = main_text[match.end():].strip()
+    documents.append(Document(text=main_text, name=f"Đường Hy Vọng, chủ đề {theme}"))
     
     return documents
