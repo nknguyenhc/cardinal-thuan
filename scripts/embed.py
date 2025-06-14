@@ -47,3 +47,23 @@ def get_road_of_hope_docs() -> list[Document]:
     documents.append(Document(text=main_text, name=f"Đường Hy Vọng, chủ đề {theme}"))
     
     return documents
+
+def get_5_loave_and_2_fish_docs() -> list[Document]:
+    with open("markdown/5-loaves-and-2-fish.md", "r", encoding="utf-8") as file:
+        text = file.read()
+    parts = re.split(r'\n={60,}\n', text)
+    assert len(parts) == 8, f"Unexpected number of parts in 5-loaves-and-2-fish: got {len(parts)}"
+
+    documents: list[Document] = []
+    for part in parts:
+        part = part.strip("=").strip()
+        match = re.search(r'\*\*(.*?)\*\*', part)
+        assert match, "No theme found in 5-loaves-and-2-fish"
+        theme = match.group(1).strip("*()")
+        print(theme)
+        main_text = part[match.end():].strip()
+        paragraphs = main_text.split("\n\n")
+        for i, paragraph in enumerate(paragraphs):
+            if paragraph.strip():
+                documents.append(Document(text=paragraph.strip(), name=f"5 Chiếc Bánh và 2 Con Cá, {theme}, đoạn {i + 1}"))
+    return documents
