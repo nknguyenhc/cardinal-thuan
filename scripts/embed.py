@@ -99,8 +99,8 @@ def get_testimony_of_hope_docs() -> list[Document]:
 
 def main():
     database = Db()
-    database.add_documents(get_road_of_hope_docs())
-    database.add_documents(get_5_loave_and_2_fish_docs())
+    database.add_documents(get_road_of_hope_docs(), collection='road_of_hope')
+    database.add_documents(get_5_loave_and_2_fish_docs(), collection='five_loaves_and_two_fish')
     # database.add_documents(get_testimony_of_hope_docs())
     print("Documents added to the database successfully.")
 

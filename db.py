@@ -33,13 +33,33 @@ class Document(BaseModel):
     name: str
 
 class Db:
-    def __init__(self, name: str = "cardinal_thuan", path: str = "chroma"):
+    def __init__(self, path: str = "chroma"):
         chroma_client = chromadb.PersistentClient(path=path)
-        self.collection = chroma_client.get_or_create_collection(name=name, embedding_function=GeminiEmbeddingFunction())
+        self.road_of_hope = chroma_client.get_or_create_collection(name='road_of_hope',
+                                                                   embedding_function=GeminiEmbeddingFunction())
+        self.five_loaves_and_two_fish = chroma_client.get_or_create_collection(name='five_loaves_and_two_fish',
+                                                                               embedding_function=GeminiEmbeddingFunction())
     
-    def query(self, query: str, n_results: int = 20) -> list[Document]:
-        results = self.collection.query(query_texts=[query], n_results=n_results)
-        return [Document(name=name, text=text) for name, text in zip(results['ids'][0], results['documents'][0])]
+    def query(self,
+              query: str,
+              n_road_of_hope: int = 100,
+              n_five_loaves_and_two_fish: int = 30) -> list[Document]:
+        results = self.road_of_hope.query(query_texts=[query], n_results=n_road_of_hope)
+        ids = results['ids'][0]
+        texts = results['documents'][0]
+        results = self.five_loaves_and_two_fish.query(query_texts=[query], n_results=n_five_loaves_and_two_fish)
+        ids += results['ids'][0]
+        texts += results['documents'][0]
+        return [Document(name=name, text=text) for name, text in zip(ids, texts)]
     
-    def add_documents(self, documents: list[Document]):
-        self.collection.add(documents=[doc.text for doc in documents], ids=[doc.name for doc in documents])
+    def add_documents(self, documents: list[Document], collection: str):
+        match collection:
+            case 'road_of_hope':
+                self._add_to_collection(documents, self.road_of_hope)
+            case 'five_loaves_and_two_fish':
+                self._add_to_collection(documents, self.five_loaves_and_two_fish)
+            case _:
+                raise ValueError(f"Unknown collection: {collection}")
+
+    def _add_to_collection(self, documents: list[Document], collection: chromadb.Collection):
+        collection.add(documents=[doc.text for doc in documents], ids=[doc.name for doc in documents])
