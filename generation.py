@@ -74,7 +74,9 @@ class Generation:
             return []
 
     def query(self, query: str) -> tuple[str, list[Document]]:
-        results = self.db.query(query)
+        results = self._pull(query)
+        self.logger.info(f"Found {len(results)} documents for query: {query}")
+        self.logger.debug(f"Documents: {results}")
         passages = self._format_docs(results)
         client = self._get_client()
         response = client.models.generate_content(
@@ -87,7 +89,7 @@ class Generation:
         return response.text.strip(), results
     
     def _format_docs(self, docs: list[Document]) -> str:
-        return "\n\n".join(f"**{doc.name.strip()}**\n{doc.text.strip()}" for doc in docs)
+        return "\n\n".join(f"# {doc.book}, {doc.name}\n{doc.text}" for doc in docs)
     
     def _get_client(self):
         gemini_api_key = os.getenv("GEMINI_API_KEY")
