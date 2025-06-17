@@ -1,9 +1,13 @@
 from pydantic import BaseModel
 import re
+import logging
+
+logger = logging.getLogger("documents")
 
 class Document(BaseModel):
     text: str
     name: str
+    book: str
 
 def get_road_of_hope_docs() -> list[Document]:
     ids = [f"{i:02d}" for i in range(1, 39)]
@@ -25,9 +29,9 @@ def get_road_of_hope_docs() -> list[Document]:
         assert parts[0].strip() == "", f"Unexpected first part in {id}: {parts[0]}"
 
         theme = matches[0].strip("*")
-        print(theme)
+        logger.info(theme)
         body = parts[1].strip()
-        documents.append(Document(name=theme, text=body))
+        documents.append(Document(name=theme, text=body, book="Road of Hope"))
     
     return documents
 
@@ -43,9 +47,9 @@ def get_5_loaves_and_2_fish_docs() -> list[Document]:
         match = re.search(r'\*\*(.*?)\*\*', part)
         assert match, "No theme found in 5-loaves-and-2-fish"
         theme = match.group(1).strip("*()")
-        print(theme)
+        logger.info(theme)
         main_text = part[match.end():].strip()
-        documents.append(Document(text=main_text, name=theme))
+        documents.append(Document(text=main_text, name=theme, book="5 Loaves and 2 Fish"))
     
     return documents
 
@@ -59,13 +63,13 @@ def get_testimony_of_hope_docs() -> list[Document]:
 
     documents: list[Document] = []
     opening = parts[0].strip()
-    documents.append(Document(text=opening, name="Lời mở đầu"))
+    documents.append(Document(text=opening, name="Lời mở đầu", book="Testimony of Hope"))
     for i in range(1, len(parts), 2):
         title = parts[i].strip()
         assert len(title) < 100, f"Title too long in testimony-of-hope: {title}"
-        print(title)
+        logger.info(title)
         content = parts[i + 1].strip()
         if not content:
             continue
-        documents.append(Document(text=content, name=title))
+        documents.append(Document(text=content, name=title, book="Testimony of Hope"))
     return documents
