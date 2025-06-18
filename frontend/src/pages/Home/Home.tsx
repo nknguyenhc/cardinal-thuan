@@ -1,6 +1,6 @@
 import TextField from '@mui/material/TextField';
 import './Home.css';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 export const Home = () => {
   return (

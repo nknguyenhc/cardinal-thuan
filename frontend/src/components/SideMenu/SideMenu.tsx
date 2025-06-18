@@ -1,14 +1,25 @@
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import Typography from '@mui/material/Typography';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import { useState } from 'react';
 import './SideMenu.css';
-import { Box, List, ListItem, ListItemButton, Typography } from '@mui/material';
+import { useNavigate } from 'react-router';
 
 export const SideMenu = () => {
   const { conversations } = useConversationsContext();
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = (title: string) => {
+    setIsOpen(false);
+    navigate(`/chat/${title}`);
+  };
 
   return (
     <div className="side-menu">
@@ -23,7 +34,9 @@ export const SideMenu = () => {
           <List>
             {conversations.map((conversation) => (
               <ListItem disablePadding>
-                <ListItemButton>{conversation.title}</ListItemButton>
+                <ListItemButton onClick={() => handleClick(conversation.title)}>
+                  {conversation.title}
+                </ListItemButton>
               </ListItem>
             ))}
           </List>
