@@ -1,0 +1,19 @@
+.home {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.home-title {
+  max-width: 800px;
+  text-align: center;
+  margin-top: 30vh !important;
+}
+
+.home-text-field {
+  width: 60vw;
+  max-width: 800px;
+}
