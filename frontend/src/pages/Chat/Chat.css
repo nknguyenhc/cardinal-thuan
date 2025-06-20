@@ -1,0 +1,33 @@
+.chat-not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.chat {
+  width: 60vw;
+  max-width: 1000px;
+  min-width: 300px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.chat-user-message {
+  border: 1px solid grey;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.chat-user-message-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
