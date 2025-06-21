@@ -3,7 +3,14 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ReactMarkdown from 'react-markdown';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
@@ -21,9 +28,28 @@ export const Chat = () => {
   );
   const newMessage = useMemo(() => getNewMessage(), []);
   const [tempMessage, setTempMessage] = useState<string>('');
+  const chatMessagesRef = useRef<HTMLUListElement>(null);
+
+  const checkAndScrollToBottom = useCallback(() => {
+    if (!chatMessagesRef.current) {
+      return;
+    }
+    const el = chatMessagesRef.current;
+    if (el) {
+      const threshold = 150;
+      const isNearBottom =
+        el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+      if (isNearBottom) {
+        el.scrollTo({
+          top: el.scrollHeight,
+        });
+      }
+    }
+  }, []);
 
   const handleFirstQuery = useCallback(async () => {
     if (!newMessage || !conversation) return;
+    const interval = setInterval(() => checkAndScrollToBottom(), 100);
     let fullMessage = '';
     for await (const chunk of query(newMessage)) {
       setTempMessage((prev) => prev + chunk);
@@ -41,11 +67,13 @@ export const Chat = () => {
     ];
     setConversation(conversation.id, messages);
     setTempMessage('');
-  }, [newMessage, conversation, setConversation]);
+    clearInterval(interval);
+  }, [newMessage, conversation, setConversation, checkAndScrollToBottom]);
 
   const handleQuery = useCallback(
     async (input: string) => {
       if (!input.trim() || !conversation) return;
+      const interval = setInterval(() => checkAndScrollToBottom(), 100);
       const newMessage = {
         role: 'user' as const,
         content: input,
@@ -62,8 +90,9 @@ export const Chat = () => {
       };
       addMessage(conversation.id, assistantMessage);
       setTempMessage('');
+      clearInterval(interval);
     },
-    [conversation, addMessage]
+    [conversation, addMessage, checkAndScrollToBottom]
   );
 
   useEffect(() => {
@@ -81,7 +110,7 @@ export const Chat = () => {
 
   return (
     <div className="chat">
-      <List className="chat-messages">
+      <List className="chat-messages" ref={chatMessagesRef}>
         {conversation.messages.map((message, index) => (
           <Fragment key={index}>
             <ListItem className="chat-message-item">
