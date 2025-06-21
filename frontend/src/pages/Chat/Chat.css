@@ -37,6 +37,7 @@
   width: 60vw !important;
   max-width: 1000px;
   min-width: 300px;
+  flex-shrink: 0;
 }
 
 .chat-user-message {

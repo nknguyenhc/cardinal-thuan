@@ -5,6 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Skeleton from '@mui/material/Skeleton';
 import ReactMarkdown from 'react-markdown';
 import {
   Fragment,
@@ -39,6 +40,7 @@ export const Chat = () => {
   const newMessage = useMemo(() => getNewMessage(), []);
   const [tempMessage, setTempMessage] = useState<string>('');
   const chatMessagesRef = useRef<HTMLUListElement>(null);
+  const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
 
   const checkAndScrollToBottom = useCallback(() => {
     if (!chatMessagesRef.current) {
@@ -60,9 +62,11 @@ export const Chat = () => {
   const handleFirstQuery = useCallback(async () => {
     if (!newMessage || !conversation) return;
     setIsLoading(true);
+    setIsAwaitingFirstChunk(true);
     const interval = setInterval(() => checkAndScrollToBottom(), 100);
     let fullMessage = '';
     for await (const chunk of query(newMessage)) {
+      setIsAwaitingFirstChunk(false);
       setTempMessage((prev) => prev + chunk);
       fullMessage += chunk;
     }
@@ -85,6 +89,7 @@ export const Chat = () => {
   const handleQuery = useCallback(
     async (input: string) => {
       if (!input.trim() || !conversation) return;
+      setIsAwaitingFirstChunk(true);
       const interval = setInterval(() => checkAndScrollToBottom(), 100);
       const newMessage = {
         role: 'user' as const,
@@ -93,6 +98,7 @@ export const Chat = () => {
       addMessage(conversation.id, newMessage);
       let fullMessage = '';
       for await (const chunk of query(input)) {
+        setIsAwaitingFirstChunk(false);
         setTempMessage((prev) => prev + chunk);
         fullMessage += chunk;
       }
@@ -158,6 +164,13 @@ export const Chat = () => {
             <Divider className="chat-message-item" />
           </Fragment>
         ))}
+        {isAwaitingFirstChunk && (
+          <Skeleton
+            className="chat-message-item"
+            height={80}
+            animation="wave"
+          />
+        )}
         {tempMessage && (
           <ListItem className="chat-message-item">
             <AssistantMessage content={tempMessage} />
