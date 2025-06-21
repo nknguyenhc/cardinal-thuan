@@ -59,7 +59,8 @@ export const Chat = () => {
   );
 
   useEffect(() => {
-    handleFirstQuery();
+    const timeout = setTimeout(() => handleFirstQuery());
+    return () => clearTimeout(timeout);
   }, []);
 
   if (!conversation) {
