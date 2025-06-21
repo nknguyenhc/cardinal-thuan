@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import { useState } from 'react';
 import './SideMenu.css';
-import { Link as RouterLink, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 
 export const SideMenu = () => {
   const { conversations } = useConversationsContext();
@@ -21,6 +21,11 @@ export const SideMenu = () => {
     navigate(`/chat/${title}`);
   };
 
+  const handleHomeClick = () => {
+    setIsOpen(false);
+    navigate('/');
+  };
+
   return (
     <div className="side-menu">
       <Button>
@@ -28,15 +33,13 @@ export const SideMenu = () => {
       </Button>
       <Drawer anchor="left" open={isOpen} onClose={() => setIsOpen(false)}>
         <Box sx={{ width: 250 }} role="presentation">
-          <RouterLink to="/" onClick={() => setIsOpen(false)}>
-            <ListItemButton>Home</ListItemButton>
-          </RouterLink>
+          <ListItemButton onClick={handleHomeClick}>Home</ListItemButton>
           <Typography variant="h6" padding={1}>
             Chats
           </Typography>
           <List>
             {conversations.map((conversation) => (
-              <ListItem disablePadding>
+              <ListItem disablePadding key={conversation.title}>
                 <ListItemButton onClick={() => handleClick(conversation.title)}>
                   {conversation.title}
                 </ListItemButton>
