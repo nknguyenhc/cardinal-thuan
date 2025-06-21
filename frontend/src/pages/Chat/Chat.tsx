@@ -10,7 +10,7 @@ import { ChatInput } from '../../components/ChatInput/ChatInput';
 import { query } from '../../api/query';
 
 export const Chat = () => {
-  const { conversations, getNewMessage, setConversation } =
+  const { conversations, getNewMessage, setConversation, addMessage } =
     useConversationsContext();
   const { id } = useParams<{ id: string }>();
 
@@ -20,30 +20,46 @@ export const Chat = () => {
   );
   const newMessage = useMemo(() => getNewMessage(), []);
 
+  const handleFirstQuery = useCallback(async () => {
+    if (!newMessage || !conversation) return;
+    const answer = await query(newMessage);
+    if (answer !== null) {
+      const messages = [
+        {
+          role: 'user' as const,
+          content: newMessage,
+        },
+        {
+          role: 'assistant' as const,
+          content: answer,
+        },
+      ];
+      setConversation(conversation.id, messages);
+    }
+  }, [newMessage, conversation, setConversation]);
+
   const handleQuery = useCallback(
     async (input: string) => {
-      if (!conversation) return;
+      if (!input.trim() || !conversation) return;
+      const newMessage = {
+        role: 'user' as const,
+        content: input,
+      };
+      addMessage(conversation.id, newMessage);
       const answer = await query(input);
       if (answer !== null) {
-        const messages = [
-          {
-            role: 'user' as const,
-            content: input,
-          },
-          {
-            role: 'assistant' as const,
-            content: answer,
-          },
-        ];
-        setConversation(conversation.id, messages);
+        const assistantMessage = {
+          role: 'assistant' as const,
+          content: answer,
+        };
+        addMessage(conversation.id, assistantMessage);
       }
     },
-    [conversation, setConversation]
+    [conversation, addMessage]
   );
 
   useEffect(() => {
-    if (!newMessage || !conversation) return;
-    handleQuery(newMessage);
+    handleFirstQuery();
   }, []);
 
   if (!conversation) {
@@ -70,7 +86,7 @@ export const Chat = () => {
           </Fragment>
         ))}
       </List>
-      <ChatInput sendButtonPosition="bottom-right" onSend={() => {}} />
+      <ChatInput sendButtonPosition="bottom-right" onSend={handleQuery} />
     </div>
   );
 };

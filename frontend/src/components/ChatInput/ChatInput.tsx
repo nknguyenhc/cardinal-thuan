@@ -37,6 +37,7 @@ export const ChatInput = ({
         className="home-text-field"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        disabled={isLoading}
       />
       <div
         style={{
@@ -44,7 +45,7 @@ export const ChatInput = ({
             sendButtonPosition === 'top-right' ? 'flex-start' : 'flex-end',
         }}
       >
-        <Button variant="outlined" onClick={handleClick}>
+        <Button variant="outlined" onClick={handleClick} disabled={isLoading}>
           SEND
         </Button>
       </div>

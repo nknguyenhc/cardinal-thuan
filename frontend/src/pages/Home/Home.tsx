@@ -9,6 +9,7 @@ export const Home = () => {
   const navigate = useNavigate();
 
   const handleSend = (message: string) => {
+    if (!message.trim()) return;
     const title = addConversation(message);
     navigate(`/chat/${title}`);
   };
