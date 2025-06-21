@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import ReactMarkdown from 'react-markdown';
 import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
@@ -73,29 +74,37 @@ export const Chat = () => {
 
   return (
     <div className="chat">
-      <List>
+      <List className="chat-messages">
         {conversation.messages.map((message, index) => (
           <Fragment key={index}>
             <ListItem>
               {message.role === 'user' ? (
                 <UserMessage content={message.content} />
               ) : (
-                message.content
+                <AssistantMessage content={message.content} />
               )}
             </ListItem>
             <Divider />
           </Fragment>
         ))}
       </List>
-      <ChatInput sendButtonPosition="bottom-right" onSend={handleQuery} />
+      <div className="chat-bottom">
+        <ChatInput sendButtonPosition="bottom-right" onSend={handleQuery} />
+      </div>
     </div>
   );
 };
 
+const AssistantMessage = ({ content }: { content: string }) => (
+  <div>
+    <ReactMarkdown>{content}</ReactMarkdown>
+  </div>
+);
+
 const UserMessage = ({ content }: { content: string }) => (
   <div className="chat-user-message-container">
     <div className="chat-user-message">
-      <Typography variant="body1">{content}</Typography>
+      <ReactMarkdown>{content}</ReactMarkdown>
     </div>
   </div>
 );

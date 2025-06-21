@@ -22,7 +22,8 @@
 .chat-user-message {
   border: 1px solid grey;
   border-radius: 8px;
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .chat-user-message-container {
