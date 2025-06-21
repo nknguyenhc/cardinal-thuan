@@ -14,17 +14,19 @@ import {
 import { generateRandomId } from './id';
 
 interface ConversationContextType {
-  newMessage: string | null;
+  getNewMessage: () => string | null;
   conversations: Conversation[];
   addConversation: (query: string) => void;
-  addMessage: (title: string, message: Message) => void;
+  addMessage: (id: string, message: Message) => void;
+  setConversation: (id: string, messages: Message[]) => void;
 }
 
 const ConversationContext = createContext<ConversationContextType>({
-  newMessage: null,
+  getNewMessage: () => null,
   conversations: [],
   addConversation: () => {},
   addMessage: () => {},
+  setConversation: () => {},
 });
 
 export const ConversationContextProvider = ({
@@ -71,10 +73,10 @@ export const ConversationContextProvider = ({
   );
 
   const addMessage = useCallback(
-    (title: string, message: Message) => {
+    (id: string, message: Message) => {
       setConversations((prev) => {
         return prev.map((conversation) => {
-          if (conversation.title === title) {
+          if (conversation.id === id) {
             return {
               ...conversation,
               messages: [...conversation.messages, message],
@@ -83,14 +85,42 @@ export const ConversationContextProvider = ({
           return conversation;
         });
       });
-      setNewMessage(null);
+    },
+    [setConversations]
+  );
+
+  const getNewMessage = useCallback(() => {
+    const message = newMessage;
+    setTimeout(() => setNewMessage(null));
+    return message;
+  }, [newMessage]);
+
+  const setConversation = useCallback(
+    (id: string, messages: Message[]) => {
+      setConversations((prev) => {
+        return prev.map((conversation) => {
+          if (conversation.id === id) {
+            return {
+              ...conversation,
+              messages: [...messages],
+            };
+          }
+          return conversation;
+        });
+      });
     },
     [setConversations]
   );
 
   return (
     <ConversationContext.Provider
-      value={{ newMessage, conversations, addConversation, addMessage }}
+      value={{
+        getNewMessage,
+        conversations,
+        addConversation,
+        addMessage,
+        setConversation,
+      }}
     >
       {children}
     </ConversationContext.Provider>

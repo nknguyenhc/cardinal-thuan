@@ -2,20 +2,49 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { Fragment, useMemo } from 'react';
+import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
 import { ChatInput } from '../../components/ChatInput/ChatInput';
+import { query } from '../../api/query';
 
 export const Chat = () => {
-  const { conversations } = useConversationsContext();
+  const { conversations, getNewMessage, setConversation } =
+    useConversationsContext();
   const { id } = useParams<{ id: string }>();
 
   const conversation = useMemo(
     () => conversations.find((c) => c.id === id),
     [conversations, id]
   );
+  const newMessage = useMemo(() => getNewMessage(), []);
+
+  const handleQuery = useCallback(
+    async (input: string) => {
+      if (!conversation) return;
+      const answer = await query(input);
+      if (answer !== null) {
+        const messages = [
+          {
+            role: 'user' as const,
+            content: input,
+          },
+          {
+            role: 'assistant' as const,
+            content: answer,
+          },
+        ];
+        setConversation(conversation.id, messages);
+      }
+    },
+    [conversation, setConversation]
+  );
+
+  useEffect(() => {
+    if (!newMessage || !conversation) return;
+    handleQuery(newMessage);
+  }, []);
 
   if (!conversation) {
     return (
