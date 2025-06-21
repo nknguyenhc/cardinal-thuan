@@ -6,7 +6,7 @@ import re
 import logging
 import json
 
-from documents import Document, get_road_of_hope_docs, get_5_loaves_and_2_fish_docs
+from .documents import Document, get_road_of_hope_docs, get_5_loaves_and_2_fish_docs
 
 dotenv.load_dotenv()
 

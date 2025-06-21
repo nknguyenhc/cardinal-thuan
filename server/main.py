@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from .models import QueryRequest
-from generation import Generation
+from ai.generation import Generation
 
 app = FastAPI()
 g = Generation()
