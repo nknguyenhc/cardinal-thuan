@@ -77,14 +77,14 @@ export const Chat = () => {
       <List className="chat-messages">
         {conversation.messages.map((message, index) => (
           <Fragment key={index}>
-            <ListItem>
+            <ListItem className="chat-message-item">
               {message.role === 'user' ? (
                 <UserMessage content={message.content} />
               ) : (
                 <AssistantMessage content={message.content} />
               )}
             </ListItem>
-            <Divider />
+            <Divider className="chat-message-item" />
           </Fragment>
         ))}
       </List>
