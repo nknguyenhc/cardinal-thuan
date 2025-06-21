@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import { Fragment } from 'react';
+import { Fragment, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
@@ -10,9 +10,12 @@ import { ChatInput } from '../../components/ChatInput/ChatInput';
 
 export const Chat = () => {
   const { conversations } = useConversationsContext();
-  const { title } = useParams<{ title: string }>();
+  const { id } = useParams<{ id: string }>();
 
-  const conversation = conversations.find((c) => c.title === title);
+  const conversation = useMemo(
+    () => conversations.find((c) => c.id === id),
+    [conversations, id]
+  );
 
   if (!conversation) {
     return (

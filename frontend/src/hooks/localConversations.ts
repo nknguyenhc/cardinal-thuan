@@ -1,9 +1,12 @@
+import { isValidId } from './id';
+
 export interface Message {
   role: 'assistant' | 'user';
   content: string;
 }
 
 export interface Conversation {
+  id: string;
   title: string;
   messages: Message[];
 }
@@ -30,11 +33,21 @@ export const loadLocalConversations = (): Conversation[] => {
     );
     return [];
   }
+  const ids = new Set<string>();
   const validConversations = conversations.filter((conv) => {
     if (!conv || !conv.title || !Array.isArray(conv.messages)) {
       console.warn('Invalid conversation format:', conv);
       return false;
     }
+    if (!isValidId(conv.id)) {
+      console.warn(`Invalid conversation ID: ${conv.id}`);
+      return false;
+    }
+    if (ids.has(conv.id)) {
+      console.warn(`Duplicate conversation ID found: ${conv.id}`);
+      return false;
+    }
+    ids.add(conv.id);
     const areMessagesValid = conv.messages.every(
       (msg: any) =>
         msg &&

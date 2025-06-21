@@ -11,6 +11,7 @@ import {
   type Conversation,
   type Message,
 } from './localConversations';
+import { generateRandomId } from './id';
 
 interface ConversationContextType {
   newMessage: string | null;
@@ -54,15 +55,17 @@ export const ConversationContextProvider = ({
 
   const addConversation = useCallback(
     (query: string) => {
+      const newId = generateRandomId();
       setConversations((prev) => {
         const newConversation: Conversation = {
+          id: newId,
           title: query,
           messages: [{ role: 'user', content: query }],
         };
         return [...prev, newConversation];
       });
       setNewMessage(query);
-      return query;
+      return newId;
     },
     [setConversations]
   );

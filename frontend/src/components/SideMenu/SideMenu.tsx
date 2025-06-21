@@ -16,9 +16,9 @@ export const SideMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleClick = (title: string) => {
+  const handleClick = (id: string) => {
     setIsOpen(false);
-    navigate(`/chat/${title}`);
+    navigate(`/chat/${id}`);
   };
 
   const handleHomeClick = () => {
@@ -40,7 +40,7 @@ export const SideMenu = () => {
           <List>
             {conversations.map((conversation) => (
               <ListItem disablePadding key={conversation.title}>
-                <ListItemButton onClick={() => handleClick(conversation.title)}>
+                <ListItemButton onClick={() => handleClick(conversation.id)}>
                   {conversation.title}
                 </ListItemButton>
               </ListItem>
