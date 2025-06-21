@@ -1,5 +1,4 @@
 import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -7,6 +6,7 @@ import { Fragment } from 'react';
 import { useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
+import { ChatInput } from '../../components/ChatInput/ChatInput';
 
 export const Chat = () => {
   const { conversations } = useConversationsContext();
@@ -38,13 +38,7 @@ export const Chat = () => {
           </Fragment>
         ))}
       </List>
-      <TextField
-        label="Ask a question"
-        placeholder="Ask me a question"
-        multiline
-        maxRows={4}
-        variant="standard"
-      />
+      <ChatInput sendButtonPosition="bottom-right" onSend={() => {}} />
     </div>
   );
 };
