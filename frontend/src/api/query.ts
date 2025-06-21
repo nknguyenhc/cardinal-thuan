@@ -5,9 +5,9 @@ const getBaseUrl = (): string => {
     case 'dev':
       return 'http://localhost:8000';
     case 'staging':
-      return 'http://localhost/api';
+      return 'http://localhost/api/';
     case 'prod':
-      return '/api';
+      return '/api/';
   }
 };
 
