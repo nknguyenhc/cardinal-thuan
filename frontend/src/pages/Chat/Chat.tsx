@@ -2,6 +2,9 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import LinearScaleIcon from '@mui/icons-material/LinearScale';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import ReactMarkdown from 'react-markdown';
 import {
   Fragment,
@@ -11,16 +14,22 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
 import { ChatInput } from '../../components/ChatInput/ChatInput';
 import { query } from '../../api/query';
 
 export const Chat = () => {
-  const { conversations, getNewMessage, setConversation, addMessage } =
-    useConversationsContext();
+  const {
+    conversations,
+    getNewMessage,
+    setConversation,
+    addMessage,
+    deleteChat,
+  } = useConversationsContext();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const conversation = useMemo(
     () => conversations.find((c) => c.id === id),
@@ -100,6 +109,21 @@ export const Chat = () => {
     return () => clearTimeout(timeout);
   }, []);
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = useMemo(() => Boolean(anchorEl), [anchorEl]);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDeleteChat = useCallback(() => {
+    if (!conversation) return;
+    deleteChat(conversation.id);
+    navigate('/');
+  }, [conversation, deleteChat, navigate]);
+
   if (!conversation) {
     return (
       <div className="chat-not-found">
@@ -110,6 +134,14 @@ export const Chat = () => {
 
   return (
     <div className="chat">
+      <div className="chat-menu">
+        <div onClick={handleClick}>
+          <LinearScaleIcon className="chat-menu-button" />
+        </div>
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <MenuItem onClick={handleDeleteChat}>Delete Chat</MenuItem>
+        </Menu>
+      </div>
       <List className="chat-messages" ref={chatMessagesRef}>
         {conversation.messages.map((message, index) => (
           <Fragment key={index}>

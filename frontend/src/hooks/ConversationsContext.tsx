@@ -19,6 +19,7 @@ interface ConversationContextType {
   addConversation: (query: string) => void;
   addMessage: (id: string, message: Message) => void;
   setConversation: (id: string, messages: Message[]) => void;
+  deleteChat: (id: string) => void;
 }
 
 const ConversationContext = createContext<ConversationContextType>({
@@ -27,6 +28,7 @@ const ConversationContext = createContext<ConversationContextType>({
   addConversation: () => {},
   addMessage: () => {},
   setConversation: () => {},
+  deleteChat: () => {},
 });
 
 export const ConversationContextProvider = ({
@@ -112,6 +114,15 @@ export const ConversationContextProvider = ({
     [setConversations]
   );
 
+  const deleteChat = useCallback(
+    (id: string) => {
+      setConversations((prev) => {
+        return prev.filter((conversation) => conversation.id !== id);
+      });
+    },
+    [setConversations]
+  );
+
   return (
     <ConversationContext.Provider
       value={{
@@ -120,6 +131,7 @@ export const ConversationContextProvider = ({
         addConversation,
         addMessage,
         setConversation,
+        deleteChat,
       }}
     >
       {children}
