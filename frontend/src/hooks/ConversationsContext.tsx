@@ -3,7 +3,9 @@ import {
   useCallback,
   useContext,
   useState,
+  type Dispatch,
   type PropsWithChildren,
+  type SetStateAction,
 } from 'react';
 import {
   loadLocalConversations,
@@ -20,6 +22,8 @@ interface ConversationContextType {
   addMessage: (id: string, message: Message) => void;
   setConversation: (id: string, messages: Message[]) => void;
   deleteChat: (id: string) => void;
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 const ConversationContext = createContext<ConversationContextType>({
@@ -29,6 +33,8 @@ const ConversationContext = createContext<ConversationContextType>({
   addMessage: () => {},
   setConversation: () => {},
   deleteChat: () => {},
+  isLoading: false,
+  setIsLoading: () => {},
 });
 
 export const ConversationContextProvider = ({
@@ -123,6 +129,8 @@ export const ConversationContextProvider = ({
     [setConversations]
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+
   return (
     <ConversationContext.Provider
       value={{
@@ -132,6 +140,8 @@ export const ConversationContextProvider = ({
         addMessage,
         setConversation,
         deleteChat,
+        isLoading,
+        setIsLoading,
       }}
     >
       {children}

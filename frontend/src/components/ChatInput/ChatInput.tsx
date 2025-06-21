@@ -2,6 +2,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import './ChatInput.css';
 import { useCallback, useState } from 'react';
+import { useConversationsContext } from '../../hooks/ConversationsContext';
 
 export const ChatInput = ({
   sendButtonPosition,
@@ -11,7 +12,7 @@ export const ChatInput = ({
   onSend: (message: string) => void | Promise<void>;
 }) => {
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, setIsLoading } = useConversationsContext();
 
   const handleClick = useCallback(async () => {
     if (isLoading || !message.trim()) return;

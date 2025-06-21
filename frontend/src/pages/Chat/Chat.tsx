@@ -27,6 +27,7 @@ export const Chat = () => {
     setConversation,
     addMessage,
     deleteChat,
+    setIsLoading,
   } = useConversationsContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ export const Chat = () => {
 
   const handleFirstQuery = useCallback(async () => {
     if (!newMessage || !conversation) return;
+    setIsLoading(true);
     const interval = setInterval(() => checkAndScrollToBottom(), 100);
     let fullMessage = '';
     for await (const chunk of query(newMessage)) {
@@ -77,6 +79,7 @@ export const Chat = () => {
     setConversation(conversation.id, messages);
     setTempMessage('');
     clearInterval(interval);
+    setIsLoading(false);
   }, [newMessage, conversation, setConversation, checkAndScrollToBottom]);
 
   const handleQuery = useCallback(
