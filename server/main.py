@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -20,8 +21,4 @@ app.add_middleware(
 
 @app.post("/")
 async def query(request: QueryRequest):
-    response, docs = g.query(request.query)
-    return {
-        "response": response,
-        "docs": [doc.model_dump() for doc in docs]
-    }
+    return StreamingResponse(g.query(request.query), media_type="text/event-stream")

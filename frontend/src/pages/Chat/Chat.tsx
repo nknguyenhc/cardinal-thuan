@@ -3,7 +3,7 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ReactMarkdown from 'react-markdown';
-import { Fragment, useCallback, useEffect, useMemo } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
@@ -20,23 +20,27 @@ export const Chat = () => {
     [conversations, id]
   );
   const newMessage = useMemo(() => getNewMessage(), []);
+  const [tempMessage, setTempMessage] = useState<string>('');
 
   const handleFirstQuery = useCallback(async () => {
     if (!newMessage || !conversation) return;
-    const answer = await query(newMessage);
-    if (answer !== null) {
-      const messages = [
-        {
-          role: 'user' as const,
-          content: newMessage,
-        },
-        {
-          role: 'assistant' as const,
-          content: answer,
-        },
-      ];
-      setConversation(conversation.id, messages);
+    let fullMessage = '';
+    for await (const chunk of query(newMessage)) {
+      setTempMessage((prev) => prev + chunk);
+      fullMessage += chunk;
     }
+    const messages = [
+      {
+        role: 'user' as const,
+        content: newMessage,
+      },
+      {
+        role: 'assistant' as const,
+        content: fullMessage,
+      },
+    ];
+    setConversation(conversation.id, messages);
+    setTempMessage('');
   }, [newMessage, conversation, setConversation]);
 
   const handleQuery = useCallback(
@@ -47,14 +51,17 @@ export const Chat = () => {
         content: input,
       };
       addMessage(conversation.id, newMessage);
-      const answer = await query(input);
-      if (answer !== null) {
-        const assistantMessage = {
-          role: 'assistant' as const,
-          content: answer,
-        };
-        addMessage(conversation.id, assistantMessage);
+      let fullMessage = '';
+      for await (const chunk of query(input)) {
+        setTempMessage((prev) => prev + chunk);
+        fullMessage += chunk;
       }
+      const assistantMessage = {
+        role: 'assistant' as const,
+        content: fullMessage,
+      };
+      addMessage(conversation.id, assistantMessage);
+      setTempMessage('');
     },
     [conversation, addMessage]
   );
@@ -87,6 +94,11 @@ export const Chat = () => {
             <Divider className="chat-message-item" />
           </Fragment>
         ))}
+        {tempMessage && (
+          <ListItem className="chat-message-item">
+            <AssistantMessage content={tempMessage} />
+          </ListItem>
+        )}
       </List>
       <div className="chat-bottom">
         <ChatInput sendButtonPosition="bottom-right" onSend={handleQuery} />

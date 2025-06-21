@@ -11,7 +11,9 @@ const getBaseUrl = (): string => {
   }
 };
 
-export const query = async (query: string): Promise<string | null> => {
+export async function* query(
+  query: string
+): AsyncGenerator<string, void, unknown> {
   const baseUrl = getBaseUrl();
   const response = await fetch(baseUrl, {
     method: 'POST',
@@ -22,13 +24,19 @@ export const query = async (query: string): Promise<string | null> => {
   });
   if (!response.ok) {
     console.error('Error querying:', response.statusText);
-    return null;
+    return;
   }
-  try {
-    const json = await response.json();
-    return json?.response || null;
-  } catch (error) {
-    console.error('Error parsing json:', error);
-    return null;
+  const reader = response.body?.getReader();
+  if (!reader) {
+    console.error('No reader available for response body');
+    return;
   }
-};
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      break;
+    }
+    const textChunk = new TextDecoder().decode(value);
+    yield textChunk;
+  }
+}

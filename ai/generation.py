@@ -74,13 +74,13 @@ class Generation:
             self.logger.error(f"Error extracting documents: {e}")
             return []
 
-    def query(self, query: str) -> tuple[str, list[Document]]:
+    async def query(self, query: str):
         results = self._pull(query)
         self.logger.info(f"Found {len(results)} documents for query: {query}")
         self.logger.debug(f"Documents: {results}")
         passages = self._format_docs(results)
         client = self._get_client()
-        response = client.models.generate_content(
+        response = client.models.generate_content_stream(
             model="gemini-2.5-flash",
             config=types.GenerateContentConfig(
                 system_instruction=self._system_prompt.format(passages=passages),
@@ -88,7 +88,8 @@ class Generation:
                 temperature=0.2),
             contents=query,
         )
-        return response.text.strip(), results
+        for chunk in response:
+            yield chunk.text
     
     def _format_docs(self, docs: list[Document]) -> str:
         return "\n\n".join(f"# {doc.book}, {doc.name}\n{doc.text}" for doc in docs)
