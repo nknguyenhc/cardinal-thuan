@@ -33,12 +33,13 @@ class Generation:
         client = self._get_client()
         chapters = "\n".join([json.dumps({"id": i, "name": doc.name}) for i, doc in enumerate(docs)])
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             config=types.GenerateContentConfig(
                 system_instruction=self._pull_prompt.format(
                     book_name=book_name,
                     chapters=chapters,
                 ),
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
                 temperature=0.2),
             contents=query,
         )
@@ -80,9 +81,10 @@ class Generation:
         passages = self._format_docs(results)
         client = self._get_client()
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             config=types.GenerateContentConfig(
                 system_instruction=self._system_prompt.format(passages=passages),
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
                 temperature=0.2),
             contents=query,
         )
