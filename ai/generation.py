@@ -17,6 +17,8 @@ class Generation:
             self._pull_prompt = file.read().strip()
         with open("prompts/system.txt", "r", encoding="utf-8") as file:
             self._system_prompt = file.read().strip()
+        with open("prompts/summary.txt", "r", encoding="utf-8") as file:
+            self._summary_prompt = file.read().strip()
         self._road_of_hope_docs = get_road_of_hope_docs()
         self._5_loaves_and_2_fish_docs = get_5_loaves_and_2_fish_docs()
     
@@ -99,3 +101,15 @@ class Generation:
         if not gemini_api_key:
             raise ValueError("Gemini API Key not provided. Please provide GEMINI_API_KEY as an environment variable")
         return genai.Client(api_key=gemini_api_key)
+    
+    def get_title(self, query: str) -> str:
+        client = self._get_client()
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=self._summary_prompt,
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+                temperature=0.7),
+            contents=query,
+        )
+        return response.text.strip()
