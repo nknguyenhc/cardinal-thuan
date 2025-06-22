@@ -40,3 +40,20 @@ export async function* query(
     yield textChunk;
   }
 }
+
+export async function getTitle(query: string): Promise<string> {
+  const baseUrl = getBaseUrl();
+  const response = await fetch(`${baseUrl}/title`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ query }),
+  });
+  if (!response.ok) {
+    console.error('Error getting title:', response.statusText);
+    return '';
+  }
+  const data = await response.json();
+  return data.title || '';
+}

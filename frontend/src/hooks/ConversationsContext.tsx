@@ -19,6 +19,7 @@ interface ConversationContextType {
   getNewMessage: () => string | null;
   conversations: Conversation[];
   addConversation: (query: string) => void;
+  setTitle: (id: string, title: string) => void;
   addMessage: (id: string, message: Message) => void;
   setConversation: (id: string, messages: Message[]) => void;
   deleteChat: (id: string) => void;
@@ -30,6 +31,7 @@ const ConversationContext = createContext<ConversationContextType>({
   getNewMessage: () => null,
   conversations: [],
   addConversation: () => {},
+  setTitle: () => {},
   addMessage: () => {},
   setConversation: () => {},
   deleteChat: () => {},
@@ -69,13 +71,30 @@ export const ConversationContextProvider = ({
       setConversations((prev) => {
         const newConversation: Conversation = {
           id: newId,
-          title: query,
+          title: null,
           messages: [{ role: 'user', content: query }],
         };
         return [...prev, newConversation];
       });
       setNewMessage(query);
       return newId;
+    },
+    [setConversations]
+  );
+
+  const setTitle = useCallback(
+    (id: string, title: string) => {
+      setConversations((prev) => {
+        return prev.map((conversation) => {
+          if (conversation.id === id) {
+            return {
+              ...conversation,
+              title: title,
+            };
+          }
+          return conversation;
+        });
+      });
     },
     [setConversations]
   );
@@ -137,6 +156,7 @@ export const ConversationContextProvider = ({
         getNewMessage,
         conversations,
         addConversation,
+        setTitle,
         addMessage,
         setConversation,
         deleteChat,

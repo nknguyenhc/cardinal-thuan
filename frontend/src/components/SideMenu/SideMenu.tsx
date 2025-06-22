@@ -7,24 +7,29 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import Typography from '@mui/material/Typography';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './SideMenu.css';
 import { useNavigate } from 'react-router';
+import type { Conversation } from '../../hooks/localConversations';
+import { getTitle } from '../../api/query';
 
 export const SideMenu = () => {
   const { conversations } = useConversationsContext();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleClick = (id: string) => {
-    setIsOpen(false);
-    navigate(`/chat/${id}`);
-  };
+  const handleClick = useCallback(
+    (id: string) => {
+      setIsOpen(false);
+      navigate(`/chat/${id}`);
+    },
+    [navigate]
+  );
 
-  const handleHomeClick = () => {
+  const handleHomeClick = useCallback(() => {
     setIsOpen(false);
     navigate('/');
-  };
+  }, [navigate]);
 
   return (
     <div className="side-menu">
@@ -39,15 +44,51 @@ export const SideMenu = () => {
           </Typography>
           <List>
             {conversations.map((conversation) => (
-              <ListItem disablePadding key={conversation.title}>
-                <ListItemButton onClick={() => handleClick(conversation.id)}>
-                  {conversation.title}
-                </ListItemButton>
+              <ListItem disablePadding key={conversation.id}>
+                <SideMenuItem
+                  key={conversation.id}
+                  click={handleClick}
+                  conversation={conversation}
+                />
               </ListItem>
             ))}
           </List>
         </Box>
       </Drawer>
     </div>
+  );
+};
+
+const SideMenuItem = ({
+  conversation,
+  click,
+}: {
+  conversation: Conversation;
+  click: (id: string) => void;
+}) => {
+  const handleClick = useCallback(() => {
+    click(conversation.id);
+  }, [click, conversation.id]);
+
+  const { setTitle } = useConversationsContext();
+
+  const determineTitle = useCallback(async () => {
+    if (conversation.messages.length === 0) {
+      return;
+    }
+    const title = await getTitle(conversation.messages[0].content);
+    setTitle(conversation.id, title);
+  }, [conversation.messages]);
+
+  useEffect(() => {
+    if (typeof conversation.title === 'string') {
+      return;
+    }
+    const timeout = setTimeout(() => determineTitle());
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return (
+    <ListItemButton onClick={handleClick}>{conversation.title}</ListItemButton>
   );
 };

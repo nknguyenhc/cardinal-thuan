@@ -7,7 +7,7 @@ export interface Message {
 
 export interface Conversation {
   id: string;
-  title: string;
+  title: string | null;
   messages: Message[];
 }
 
@@ -35,7 +35,11 @@ export const loadLocalConversations = (): Conversation[] => {
   }
   const ids = new Set<string>();
   const validConversations = conversations.filter((conv) => {
-    if (!conv || !conv.title || !Array.isArray(conv.messages)) {
+    if (
+      !conv ||
+      typeof conv.title !== 'string' ||
+      !Array.isArray(conv.messages)
+    ) {
       console.warn('Invalid conversation format:', conv);
       return false;
     }
