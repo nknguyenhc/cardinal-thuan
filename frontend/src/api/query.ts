@@ -3,7 +3,7 @@ import { getMode } from './env';
 const getBaseUrl = (): string => {
   switch (getMode()) {
     case 'dev':
-      return 'http://localhost:8000';
+      return 'http://localhost:8000/';
     case 'staging':
       return 'http://localhost/api/';
     case 'prod':
@@ -43,7 +43,7 @@ export async function* query(
 
 export async function getTitle(query: string): Promise<string> {
   const baseUrl = getBaseUrl();
-  const response = await fetch(`${baseUrl}/title`, {
+  const response = await fetch(`${baseUrl}title`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
