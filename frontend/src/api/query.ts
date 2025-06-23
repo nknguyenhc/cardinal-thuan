@@ -5,9 +5,9 @@ const getBaseUrl = (): string => {
     case 'dev':
       return 'http://localhost:8000/';
     case 'staging':
-      return 'http://localhost/api/';
+      return 'http://localhost:8000/';
     case 'prod':
-      return '/api/';
+      return 'https://cardinal-thuan-backend.nknguyenhc.net/';
   }
 };
 
