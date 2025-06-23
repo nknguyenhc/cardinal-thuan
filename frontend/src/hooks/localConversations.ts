@@ -37,7 +37,7 @@ export const loadLocalConversations = (): Conversation[] => {
   const validConversations = conversations.filter((conv) => {
     if (
       !conv ||
-      typeof conv.title !== 'string' ||
+      (typeof conv.title !== 'string' && conv.title !== null) ||
       !Array.isArray(conv.messages)
     ) {
       console.warn('Invalid conversation format:', conv);

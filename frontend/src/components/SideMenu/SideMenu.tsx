@@ -6,6 +6,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import Typography from '@mui/material/Typography';
+import Skeleton from '@mui/material/Skeleton';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import { useCallback, useEffect, useState } from 'react';
 import './SideMenu.css';
@@ -89,6 +90,11 @@ const SideMenuItem = ({
   }, []);
 
   return (
-    <ListItemButton onClick={handleClick}>{conversation.title}</ListItemButton>
+    <ListItemButton onClick={handleClick}>
+      {!conversation.title && (
+        <Skeleton height={40} animation="wave" width="100%" />
+      )}
+      {conversation.title}
+    </ListItemButton>
   );
 };
