@@ -21,7 +21,7 @@ app.add_middleware(
 
 @app.post("/")
 async def query(request: QueryRequest):
-    return StreamingResponse(g.query(request.query), media_type="text/event-stream")
+    return StreamingResponse(g.query(request.query))
 
 @app.post("/title")
 async def get_title(request: QueryRequest):
