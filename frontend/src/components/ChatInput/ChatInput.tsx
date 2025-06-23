@@ -12,18 +12,15 @@ export const ChatInput = ({
   onSend: (message: string) => void | Promise<void>;
 }) => {
   const [message, setMessage] = useState('');
-  const { isLoading, setIsLoading } = useConversationsContext();
+  const { isLoading } = useConversationsContext();
 
   const handleClick = useCallback(async () => {
     if (isLoading || !message.trim()) return;
-    setIsLoading(true);
     try {
       await onSend(message.trim());
       setMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
-    } finally {
-      setIsLoading(false);
     }
   }, [message, onSend, isLoading]);
 

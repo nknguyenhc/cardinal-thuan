@@ -6,6 +6,7 @@ import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Skeleton from '@mui/material/Skeleton';
+import Alert from '@mui/material/Alert';
 import ReactMarkdown from 'react-markdown';
 import {
   Fragment,
@@ -42,6 +43,7 @@ export const Chat = () => {
   const [tempMessage, setTempMessage] = useState<string>('');
   const chatMessagesRef = useRef<HTMLUListElement>(null);
   const [isAwaitingFirstChunk, setIsAwaitingFirstChunk] = useState(false);
+  const [isFetchError, setIsFetchError] = useState(false);
 
   const checkAndScrollToBottom = useCallback(() => {
     if (!chatMessagesRef.current) {
@@ -64,24 +66,31 @@ export const Chat = () => {
     if (!newMessage || !conversation) return;
     setIsLoading(true);
     setIsAwaitingFirstChunk(true);
+    setIsFetchError(false);
     const interval = setInterval(() => checkAndScrollToBottom(), 100);
     let fullMessage = '';
-    for await (const chunk of query(newMessage)) {
+    try {
+      for await (const chunk of query(newMessage)) {
+        setIsAwaitingFirstChunk(false);
+        setTempMessage((prev) => prev + chunk);
+        fullMessage += chunk;
+      }
+      const messages = [
+        {
+          role: 'user' as const,
+          content: newMessage,
+        },
+        {
+          role: 'assistant' as const,
+          content: fullMessage,
+        },
+      ];
+      setConversation(conversation.id, messages);
+    } catch (error) {
+      console.error('Error during query:', error);
+      setIsFetchError(true);
       setIsAwaitingFirstChunk(false);
-      setTempMessage((prev) => prev + chunk);
-      fullMessage += chunk;
     }
-    const messages = [
-      {
-        role: 'user' as const,
-        content: newMessage,
-      },
-      {
-        role: 'assistant' as const,
-        content: fullMessage,
-      },
-    ];
-    setConversation(conversation.id, messages);
     setTempMessage('');
     clearInterval(interval);
     setIsLoading(false);
@@ -102,7 +111,9 @@ export const Chat = () => {
   const handleQuery = useCallback(
     async (input: string) => {
       if (!input.trim() || !conversation) return;
+      setIsLoading(true);
       setIsAwaitingFirstChunk(true);
+      setIsFetchError(false);
       const interval = setInterval(() => checkAndScrollToBottom(), 100);
       const newMessage = {
         role: 'user' as const,
@@ -110,18 +121,25 @@ export const Chat = () => {
       };
       addMessage(conversation.id, newMessage);
       let fullMessage = '';
-      for await (const chunk of query(input)) {
+      try {
+        for await (const chunk of query(input)) {
+          setIsAwaitingFirstChunk(false);
+          setTempMessage((prev) => prev + chunk);
+          fullMessage += chunk;
+        }
+        const assistantMessage = {
+          role: 'assistant' as const,
+          content: fullMessage,
+        };
+        addMessage(conversation.id, assistantMessage);
+      } catch (error) {
+        console.error('Error during query:', error);
+        setIsFetchError(true);
         setIsAwaitingFirstChunk(false);
-        setTempMessage((prev) => prev + chunk);
-        fullMessage += chunk;
       }
-      const assistantMessage = {
-        role: 'assistant' as const,
-        content: fullMessage,
-      };
-      addMessage(conversation.id, assistantMessage);
       setTempMessage('');
       clearInterval(interval);
+      setIsLoading(false);
     },
     [conversation, addMessage, checkAndScrollToBottom]
   );
@@ -190,6 +208,11 @@ export const Chat = () => {
         {tempMessage && (
           <ListItem className="chat-message-item">
             <AssistantMessage content={tempMessage} />
+          </ListItem>
+        )}
+        {isFetchError && (
+          <ListItem className="chat-message-item">
+            <Alert severity="error">Failed to generate response</Alert>
           </ListItem>
         )}
       </List>
