@@ -19,7 +19,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
 import { ChatInput } from '../../components/ChatInput/ChatInput';
-import { query } from '../../api/query';
+import { getTitle, query } from '../../api/query';
 
 export const Chat = () => {
   const {
@@ -29,6 +29,7 @@ export const Chat = () => {
     addMessage,
     deleteChat,
     setIsLoading,
+    setTitle,
   } = useConversationsContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -86,6 +87,18 @@ export const Chat = () => {
     setIsLoading(false);
   }, [newMessage, conversation, setConversation, checkAndScrollToBottom]);
 
+  const determineTitle = useCallback(async () => {
+    if (
+      !conversation ||
+      conversation.messages.length === 0 ||
+      conversation.title
+    ) {
+      return;
+    }
+    const title = await getTitle(conversation.messages[0].content);
+    setTitle(conversation.id, title);
+  }, [conversation, setTitle]);
+
   const handleQuery = useCallback(
     async (input: string) => {
       if (!input.trim() || !conversation) return;
@@ -114,7 +127,10 @@ export const Chat = () => {
   );
 
   useEffect(() => {
-    const timeout = setTimeout(() => handleFirstQuery());
+    const timeout = setTimeout(() => {
+      handleFirstQuery();
+      determineTitle();
+    });
     return () => clearTimeout(timeout);
   }, []);
 

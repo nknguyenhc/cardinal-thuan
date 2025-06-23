@@ -8,11 +8,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import './SideMenu.css';
 import { useNavigate } from 'react-router';
 import type { Conversation } from '../../hooks/localConversations';
-import { getTitle } from '../../api/query';
 
 export const SideMenu = () => {
   const { conversations } = useConversationsContext();
@@ -70,24 +69,6 @@ const SideMenuItem = ({
   const handleClick = useCallback(() => {
     click(conversation.id);
   }, [click, conversation.id]);
-
-  const { setTitle } = useConversationsContext();
-
-  const determineTitle = useCallback(async () => {
-    if (conversation.messages.length === 0) {
-      return;
-    }
-    const title = await getTitle(conversation.messages[0].content);
-    setTitle(conversation.id, title);
-  }, [conversation.messages]);
-
-  useEffect(() => {
-    if (typeof conversation.title === 'string') {
-      return;
-    }
-    const timeout = setTimeout(() => determineTitle());
-    return () => clearTimeout(timeout);
-  }, []);
 
   return (
     <ListItemButton onClick={handleClick}>
