@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
+import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import { useConversationsContext } from '../../hooks/ConversationsContext';
@@ -52,6 +53,21 @@ export const SideMenu = () => {
                 />
               </ListItem>
             ))}
+          </List>
+          <Typography variant="h6" padding={1}>
+            References
+          </Typography>
+          <List>
+            <ListItem>
+              <Link href="https://vntaiwan.catholic.org.tw/hyvong2/hyvong2.htm">
+                Road of Hope
+              </Link>
+            </ListItem>
+            <ListItem>
+              <Link href="https://suyniemhangngay.net/wp-content/uploads/2016/08/N%C4%82M-CHI%E1%BA%BEC-B%C3%81NH-V%C3%80-HAI-CON-C%C3%81-%C4%90HY-Nguy%E1%BB%85n-V%C4%83n-Thu%E1%BA%ADn.pdf">
+                5 Loaves and 2 Fish
+              </Link>
+            </ListItem>
           </List>
         </Box>
       </Drawer>
