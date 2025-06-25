@@ -33,6 +33,12 @@
   width: 100%;
 }
 
+@media print {
+  .chat-messages {
+    overflow-y: visible;
+  }
+}
+
 .chat-message-item {
   width: 60vw !important;
   max-width: 1000px;
