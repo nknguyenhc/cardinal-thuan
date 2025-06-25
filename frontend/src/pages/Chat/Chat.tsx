@@ -7,6 +7,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Skeleton from '@mui/material/Skeleton';
 import Alert from '@mui/material/Alert';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ReactMarkdown from 'react-markdown';
 import {
   Fragment,
@@ -224,8 +225,14 @@ export const Chat = () => {
 };
 
 const AssistantMessage = ({ content }: { content: string }) => (
-  <div>
+  <div className="chat-assistant-message">
     <ReactMarkdown>{content}</ReactMarkdown>
+    <div className="chat-assistant-message-tools">
+      <ContentCopyIcon
+        className="chat-assistant-message-tool"
+        onClick={() => navigator.clipboard.writeText(content)}
+      />
+    </div>
   </div>
 );
 
