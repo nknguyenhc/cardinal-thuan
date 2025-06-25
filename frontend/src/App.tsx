@@ -1,11 +1,14 @@
 import { RouterProvider } from 'react-router';
 import { router } from './router';
 import { ConversationContextProvider } from './hooks/ConversationsContext';
+import { SnackbarContextProvider } from './hooks/SnackbarContext';
 
 function App() {
   return (
     <ConversationContextProvider>
-      <RouterProvider router={router} />
+      <SnackbarContextProvider>
+        <RouterProvider router={router} />
+      </SnackbarContextProvider>
     </ConversationContextProvider>
   );
 }

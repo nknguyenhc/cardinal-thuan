@@ -22,6 +22,7 @@ import { useConversationsContext } from '../../hooks/ConversationsContext';
 import './Chat.css';
 import { ChatInput } from '../../components/ChatInput/ChatInput';
 import { getTitle, query } from '../../api/query';
+import { useSnackbarContext } from '../../hooks/SnackbarContext';
 
 export const Chat = () => {
   const {
@@ -224,17 +225,26 @@ export const Chat = () => {
   );
 };
 
-const AssistantMessage = ({ content }: { content: string }) => (
-  <div className="chat-assistant-message">
-    <ReactMarkdown>{content}</ReactMarkdown>
-    <div className="chat-assistant-message-tools">
-      <ContentCopyIcon
-        className="chat-assistant-message-tool"
-        onClick={() => navigator.clipboard.writeText(content)}
-      />
+const AssistantMessage = ({ content }: { content: string }) => {
+  const { success } = useSnackbarContext();
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(content);
+    success('Content copied to clipboard');
+  }, [content]);
+
+  return (
+    <div className="chat-assistant-message">
+      <ReactMarkdown>{content}</ReactMarkdown>
+      <div className="chat-assistant-message-tools">
+        <ContentCopyIcon
+          className="chat-assistant-message-tool"
+          onClick={handleCopy}
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const UserMessage = ({ content }: { content: string }) => (
   <div className="chat-user-message-container">
