@@ -23,13 +23,11 @@ export async function* query(
     body: JSON.stringify({ query }),
   });
   if (!response.ok) {
-    console.error('Error querying:', response.statusText);
-    return;
+    throw new Error(`Query failed: ${response.statusText}`);
   }
   const reader = response.body?.getReader();
   if (!reader) {
-    console.error('No reader available for response body');
-    return;
+    throw new Error('No reader available for response body');
   }
   while (true) {
     const { value, done } = await reader.read();
@@ -51,8 +49,7 @@ export async function getTitle(query: string): Promise<string> {
     body: JSON.stringify({ query }),
   });
   if (!response.ok) {
-    console.error('Error getting title:', response.statusText);
-    return '';
+    throw new Error(`Get title failed: ${response.statusText}`);
   }
   const data = await response.json();
   return data.title || '';

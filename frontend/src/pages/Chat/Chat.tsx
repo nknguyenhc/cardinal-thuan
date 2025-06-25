@@ -34,6 +34,7 @@ export const Chat = () => {
     setIsLoading,
     setTitle,
   } = useConversationsContext();
+  const snackbarContext = useSnackbarContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -106,8 +107,13 @@ export const Chat = () => {
     ) {
       return;
     }
-    const title = await getTitle(conversation.messages[0].content);
-    setTitle(conversation.id, title);
+    try {
+      const title = await getTitle(conversation.messages[0].content);
+      setTitle(conversation.id, title);
+    } catch (error) {
+      console.error('Error fetching title:', error);
+      snackbarContext.error('Failed to create title for conversation');
+    }
   }, [conversation, setTitle]);
 
   const handleQuery = useCallback(
