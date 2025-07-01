@@ -39,7 +39,14 @@ export const SideMenu = () => {
       </Button>
       <Drawer anchor="left" open={isOpen} onClose={() => setIsOpen(false)}>
         <Box sx={{ width: 250 }} role="presentation">
-          <ListItemButton onClick={handleHomeClick}>Home</ListItemButton>
+          <List>
+            <ListItemButton onClick={handleHomeClick}>Home</ListItemButton>
+            <ListItem>
+              <Link href="https://catholic.nknguyenhc.net/contents/catholic-church-history/cardinal-thuan.html">
+                About Cardinal Thuan
+              </Link>
+            </ListItem>
+          </List>
           <Typography variant="h6" padding={1}>
             Chats
           </Typography>
